@@ -1,38 +1,99 @@
-# Campus Placement Resume Analyzer System
+# 🎓 Campus Placement Resume Analyzer & Ranker
 
-A full-stack web application designed for college placement cells to manage student resumes, company drives, and automate the shortlisting process based on academic eligibility and skill matching.
+A state-of-the-art recruitment automation system designed for college placement cells. This platform uses AI to parse resumes, verify eligibility, and rank candidates based on a holistic score composition of skills, experience, projects, and academics.
 
-## Features
+## 🚀 Key Features
 
-- **Admin Authentication**: Restricted access for placement cell administrators.
-- **Resume Upload & Parsing**: Automatically extracts skills and candidate info from PDF resumes.
-- **Job Drive Management**: Create company-specific requirements (Min CGPA, Allowed Branches, Skills).
-- **Automated Eligibility Filtering**: Instantly filters students who meet the academic criteria.
-- **Smart Ranking**: Ranks candidates based on Skill Match and TF-IDF similarity between resume and job description.
-- **Premium UI**: Clean, responsive dashboard with analytics and easy navigation.
+-   **Holistic AI Ranking**: Moves beyond keyword matching to evaluate candidates based on:
+    -   **40% Skills match** (NLP keyword extraction)
+    -   **20% CGPA** (Academic performance)
+    -   **15% Work Experience** (Internships/Jobs)
+    -   **15% Personal Projects**
+    -   **10% TF-IDF Similarity** (Contextual relevance)
+-   **Smart Eligibility Filter**: Automated screening for Branch and CGPA criteria.
+-   **Bulk Resume Processing**: Upload dozens of PDF resumes simultaneously.
+-   **Automated Verification**: Email-based signup with 6-digit verification codes.
+-   **Placement Management**: Create, edit, and delete job drives with custom criteria.
+-   **Analytics Dashboard**: Real-time stats on student registrations and drive activity.
+-   **Data Export**: Download ranked lists as CSV for official shortlisting.
 
-## Tech Stack
+---
 
-- **Frontend**: React (Vite), Tailwind CSS, Lucide Icons, Axios.
-- **Backend**: Flask (Python), MongoDB (PyMongo), Scikit-learn (TF-IDF).
-- **Database**: MongoDB.
+## 🛠️ Tech Stack
 
-## Getting Started
+-   **Frontend**: React.js, Vite, TailwindCSS, Lucide Icons.
+-   **Backend**: Flask (Python), Flask-Mail (OTP verification).
+-   **Database**: MongoDB Atlas (Cloud NoSQL).
+-   **AI/ML**: Scikit-learn (TF-IDF Similarity), Regex-based NLP for extraction.
 
-### Backend Setup
-1. Navigate to `/backend`.
-2. Install dependencies: `pip install -r requirements.txt`.
-3. Create a `.env` file (optional, defaults provided in `config.py`).
-4. Run the app: `python app.py`.
+---
 
-### Frontend Setup
-1. Navigate to `/frontend`.
-2. Install dependencies: `npm install`.
-3. Start the dev server: `npm run dev`.
+## 🏃 Getting Started
 
-## Usage Flow
-1. **Login**: Use the admin portal. (Default: Any credentials if registering first).
-2. **Register Admin**: Go to `/auth/register` (API) or implement a signup page.
-3. **Upload Students**: Add student details and upload resumes.
-4. **Create Job**: Define company drive requirements.
-5. **Generate Ranking**: Select a job drive and click "Generate Rankings".
+### Prerequisites
+-   Python 3.8+
+-   Node.js 16+
+-   MongoDB Atlas Account
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/mayanksali05/resume-analyzer.git
+cd resume-analyzer
+```
+
+### 2. Backend Setup
+```bash
+cd backend
+# Create virtual environment
+python -m venv venv
+# Activate it (Windows)
+.\venv\Scripts\activate
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 3. Environment Configuration
+Create a `.env` file in the `backend/` folder:
+```env
+MONGO_URI=your_mongodb_atlas_uri
+SECRET_KEY=your_random_secret_key
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password
+MAIL_DEFAULT_SENDER=your_email@gmail.com
+```
+
+### 4. Frontend Setup
+```bash
+cd ../frontend
+npm install
+```
+
+### 5. Running the Application
+**Backend:**
+```bash
+cd backend
+python app.py
+```
+**Frontend:**
+```bash
+cd frontend
+npm run dev
+```
+
+---
+
+## 🌐 Deployment (Vercel)
+
+1.  Push your code to GitHub.
+2.  Connect the repository to Vercel.
+3.  Set the **Build Command**: `cd frontend && npm install && npm run build`
+4.  Set the **Output Directory**: `frontend/dist`
+5.  Add your `.env` variables in Vercel settings.
+6.  Set `VITE_API_BASE_URL` to `/api`.
+
+---
+
+## 📄 License
+Distributed under the MIT License.
