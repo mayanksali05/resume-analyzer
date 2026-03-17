@@ -8,3 +8,7 @@ from app import create_app
 
 # Vercel expects the app instance to be exported as 'app'
 app = create_app()
+
+@app.route('/api')
+def api_index():
+    return {"message": "Backend API is live at /api"}
