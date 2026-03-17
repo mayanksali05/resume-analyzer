@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/api';
-import { LogIn, ShieldCheck } from 'lucide-react';
+import { LogIn, ShieldCheck, MailWarning } from 'lucide-react';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -19,7 +19,12 @@ const LoginPage = () => {
             localStorage.setItem('user', JSON.stringify(response.data));
             navigate('/dashboard');
         } catch (err) {
-            setError('Invalid email or password');
+            if (err.response?.status === 403 && err.response?.data?.not_verified) {
+                setError('Email not verified. Redirecting...');
+                setTimeout(() => navigate(`/verify?email=${encodeURIComponent(email)}`), 1500);
+            } else {
+                setError('Invalid email or password');
+            }
         } finally {
             setLoading(false);
         }
@@ -32,7 +37,7 @@ const LoginPage = () => {
                     <div className="bg-blue-600 p-4 rounded-full mb-4">
                         <ShieldCheck size={32} className="text-white" />
                     </div>
-                    <h1 className="text-3xl font-bold text-white">Placement Cell</h1>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">Placement Cell</h1>
                     <p className="text-slate-400 mt-2">Admin Login Portal</p>
                 </div>
 
@@ -48,10 +53,16 @@ const LoginPage = () => {
 
                     {error && <div className="text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20">{error}</div>}
 
-                    <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                    <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 transform active:scale-95">
                         <LogIn size={20} />
                         {loading ? 'Authenticating...' : 'Sign In'}
                     </button>
+                    
+                    <div className="text-center pt-4">
+                        <p className="text-slate-500 text-sm">
+                            Don't have an account? <Link to="/register" className="text-blue-500 font-bold hover:underline">Sign Up</Link>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

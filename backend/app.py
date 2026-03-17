@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from config import Config
+from extensions import mail
 from routes.auth_routes import auth_bp
 from routes.student_routes import student_bp
 from routes.job_routes import job_bp
@@ -10,6 +11,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     CORS(app)
+    mail.init_app(app)
     
     # Register Blueprints
     app.register_blueprint(auth_bp, url_prefix='/auth')

@@ -7,6 +7,9 @@ import UploadStudentPage from './pages/UploadStudentPage';
 import JobCreationPage from './pages/JobCreationPage';
 import RankingPage from './pages/RankingPage';
 
+import RegisterPage from './pages/RegisterPage';
+import VerificationPage from './pages/VerificationPage';
+
 const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem('user');
   if (!user) return <Navigate to="/login" />;
@@ -15,12 +18,13 @@ const ProtectedRoute = ({ children }) => {
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const isLoginPage = location.pathname === '/login';
+  const noNavbarPaths = ['/login', '/register', '/verify'];
+  const hideNavbar = noNavbarPaths.includes(location.pathname);
 
   return (
     <div className="flex bg-slate-50 min-h-screen">
-      {!isLoginPage && <Navbar />}
-      <main className={`flex-1 ${!isLoginPage ? 'ml-64 p-10' : ''}`}>
+      {!hideNavbar && <Navbar />}
+      <main className={`flex-1 ${!hideNavbar ? 'ml-64 p-10' : ''}`}>
         {children}
       </main>
     </div>
@@ -33,6 +37,8 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify" element={<VerificationPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/upload-student" element={<ProtectedRoute><UploadStudentPage /></ProtectedRoute>} />
           <Route path="/create-job" element={<ProtectedRoute><JobCreationPage /></ProtectedRoute>} />

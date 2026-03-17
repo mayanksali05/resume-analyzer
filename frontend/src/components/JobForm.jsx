@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { jobService } from '../services/api';
 import { Briefcase, Plus, CheckCircle, XCircle } from 'lucide-react';
 
-const JobForm = ({ onJobCreated }) => {
+const JobForm = ({ onJobCreated, editJob, onCancel }) => {
     const [formData, setFormData] = useState({
         company_name: '',
         job_role: '',
@@ -13,6 +13,28 @@ const JobForm = ({ onJobCreated }) => {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
+
+    useEffect(() => {
+        if (editJob) {
+            setFormData({
+                company_name: editJob.company_name,
+                job_role: editJob.job_role,
+                job_description: editJob.job_description,
+                required_skills: editJob.required_skills.join(', '),
+                min_cgpa: editJob.min_cgpa || '',
+                allowed_branches: editJob.allowed_branches
+            });
+        } else {
+            setFormData({
+                company_name: '',
+                job_role: '',
+                job_description: '',
+                required_skills: '',
+                min_cgpa: '',
+                allowed_branches: []
+            });
+        }
+    }, [editJob]);
 
     const branches = ["CSE", "IT", "ECE", "EE", "Mechanical", "Civil"];
 
@@ -37,15 +59,22 @@ const JobForm = ({ onJobCreated }) => {
         const data = {
             ...formData,
             required_skills: formData.required_skills.split(',').map(s => s.trim()),
+            min_cgpa: formData.min_cgpa === '' ? 0 : parseFloat(formData.min_cgpa)
         };
 
         try {
-            await jobService.createJob(data);
-            setMessage({ type: 'success', text: 'Job drive created successfully!' });
+            if (editJob) {
+                await jobService.updateJob(editJob._id, data);
+                setMessage({ type: 'success', text: 'Job drive updated successfully!' });
+            } else {
+                await jobService.createJob(data);
+                setMessage({ type: 'success', text: 'Job drive created successfully!' });
+            }
             setFormData({ company_name: '', job_role: '', job_description: '', required_skills: '', min_cgpa: '', allowed_branches: [] });
             if (onJobCreated) onJobCreated();
+            if (onCancel) onCancel();
         } catch (error) {
-            setMessage({ type: 'error', text: 'Error creating job drive.' });
+            setMessage({ type: 'error', text: `Error ${editJob ? 'updating' : 'creating'} job drive.` });
         } finally {
             setLoading(false);
         }
@@ -55,7 +84,7 @@ const JobForm = ({ onJobCreated }) => {
         <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl border border-slate-100">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                 <Briefcase className="text-blue-600" />
-                Create Company Placement Drive
+                {editJob ? 'Edit Placement Drive' : 'Create Company Placement Drive'}
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -82,8 +111,19 @@ const JobForm = ({ onJobCreated }) => {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
-                        <label className="text-sm font-semibold">Minimum CGPA</label>
-                        <input name="min_cgpa" type="number" step="0.01" value={formData.min_cgpa} onChange={handleInputChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="7.5" required />
+                        <label className="text-sm font-semibold flex justify-between">
+                            Minimum CGPA Criteria
+                            <span className="text-slate-400 font-normal text-xs">(Optional)</span>
+                        </label>
+                        <input 
+                            name="min_cgpa" 
+                            type="number" 
+                            step="0.01" 
+                            value={formData.min_cgpa} 
+                            onChange={handleInputChange} 
+                            className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" 
+                            placeholder="e.g. 7.5 (Blank = No CGPA bar)" 
+                        />
                     </div>
                 </div>
 
@@ -98,10 +138,17 @@ const JobForm = ({ onJobCreated }) => {
                     </div>
                 </div>
 
-                <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-4 rounded-lg font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
-                    <Plus size={20} />
-                    {loading ? "Creating..." : "Create Job Drive"}
-                </button>
+                <div className="flex gap-4">
+                    {editJob && (
+                        <button type="button" onClick={onCancel} className="flex-1 bg-slate-100 text-slate-600 p-4 rounded-lg font-bold hover:bg-slate-200 transition-all">
+                            Cancel
+                        </button>
+                    )}
+                    <button type="submit" disabled={loading} className={`flex-[2] ${editJob ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-blue-600 hover:bg-blue-700'} text-white p-4 rounded-lg font-bold transition-all flex items-center justify-center gap-2`}>
+                        {editJob ? <CheckCircle size={20} /> : <Plus size={20} />}
+                        {loading ? (editJob ? "Updating..." : "Creating...") : (editJob ? "Update Job Drive" : "Create Job Drive")}
+                    </button>
+                </div>
             </form>
 
             {message && (

@@ -42,6 +42,8 @@ def upload_student():
             "cgpa": cgpa,
             "skills": parsed_data['skills'],
             "education": parsed_data['education'],
+            "experience_score": parsed_data.get('experience_score', 0),
+            "projects_score": parsed_data.get('projects_score', 0),
             "resume_text": cleaned_text,
             "resume_file_path": filepath
         }
@@ -85,6 +87,8 @@ def bulk_upload():
             "cgpa": parsed_data['cgpa'],
             "skills": parsed_data['skills'],
             "education": parsed_data['education'],
+            "experience_score": parsed_data.get('experience_score', 0),
+            "projects_score": parsed_data.get('projects_score', 0),
             "resume_text": cleaned_text,
             "resume_file_path": filepath
         }
@@ -93,3 +97,20 @@ def bulk_upload():
         results.append({"filename": filename, "status": "processed"})
         
     return jsonify({"message": f"Successfully processed {len(results)} resumes", "results": results}), 201
+
+@student_bp.route('/students/<student_id>', methods=['DELETE'])
+def delete_student(student_id):
+    from bson import ObjectId
+    try:
+        # Delete student
+        result = students_collection.delete_one({"_id": ObjectId(student_id)})
+        
+        if result.deleted_count > 0:
+            # Also cleanup rankings for this student
+            from models.database import rankings_collection
+            rankings_collection.delete_many({"student_id": student_id})
+            return jsonify({"message": "Student removed successfully"}), 200
+        else:
+            return jsonify({"message": "Student not found"}), 404
+    except Exception as e:
+        return jsonify({"message": f"Error deleting student: {str(e)}"}), 500

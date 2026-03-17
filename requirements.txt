@@ -1,0 +1,9 @@
+flask
+flask-cors
+pymongo
+PyPDF2
+scikit-learn
+pandas
+python-dotenv
+werkzeug
+flask-mail

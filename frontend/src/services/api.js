@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -9,6 +9,8 @@ const api = axios.create({
 export const authService = {
     login: (credentials) => api.post('/auth/login', credentials),
     register: (details) => api.post('/auth/register', details),
+    verifyEmail: (data) => api.post('/auth/verify', data),
+    resendCode: (email) => api.post('/auth/resend-code', { email }),
 };
 
 export const studentService = {
@@ -19,11 +21,14 @@ export const studentService = {
         headers: { 'Content-Type': 'multipart/form-data' }
     }),
     getStudents: () => api.get('/student/students'),
+    deleteStudent: (studentId) => api.delete(`/student/students/${studentId}`),
 };
 
 export const jobService = {
     createJob: (jobData) => api.post('/job/create_job', jobData),
     getJobs: () => api.get('/job/jobs'),
+    updateJob: (jobId, jobData) => api.put(`/job/jobs/${jobId}`, jobData),
+    deleteJob: (jobId) => api.delete(`/job/jobs/${jobId}`),
 };
 
 export const rankingService = {

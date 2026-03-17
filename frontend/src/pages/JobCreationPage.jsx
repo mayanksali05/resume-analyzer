@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import JobForm from '../components/JobForm';
 import { jobService } from '../services/api';
-import { Briefcase, Calendar, Target, CheckCircle } from 'lucide-react';
+import { Briefcase, Calendar, Target, CheckCircle, Edit, Trash2 } from 'lucide-react';
 
 const JobCreationPage = () => {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [editJob, setEditJob] = useState(null);
 
     const fetchJobs = async () => {
         try {
@@ -15,6 +16,17 @@ const JobCreationPage = () => {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeleteJob = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this job drive?")) return;
+        try {
+            await jobService.deleteJob(id);
+            fetchJobs();
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting job");
         }
     };
 
@@ -30,7 +42,11 @@ const JobCreationPage = () => {
             </header>
 
             <div className="flex flex-col lg:flex-row gap-8">
-                <JobForm onJobCreated={fetchJobs} />
+                <JobForm 
+                    onJobCreated={fetchJobs} 
+                    editJob={editJob} 
+                    onCancel={() => setEditJob(null)} 
+                />
                 
                 <div className="flex-1 space-y-4 h-[700px] overflow-y-auto pr-2">
                     <h2 className="text-2xl font-bold mb-2">Active Job Drives</h2>
@@ -38,14 +54,30 @@ const JobCreationPage = () => {
                         <p className="text-slate-400 italic">No job drives created yet.</p>
                     ) : (
                         jobs.map((job) => (
-                            <div key={job._id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                            <div key={job._id} className={`bg-white p-6 rounded-xl shadow-sm border ${editJob?._id === job._id ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-100'} hover:shadow-md transition-all`}>
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
                                         <h4 className="text-xl font-bold text-slate-900">{job.company_name}</h4>
                                         <p className="text-blue-600 font-medium">{job.job_role}</p>
                                     </div>
-                                    <div className="bg-slate-100 p-2 rounded-lg text-slate-500">
-                                        <Briefcase size={20} />
+                                    <div className="flex gap-2">
+                                        <button 
+                                            onClick={() => {
+                                                setEditJob(job);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                            className="p-2 bg-slate-100 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                            title="Edit Drive"
+                                        >
+                                            <Edit size={18} />
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDeleteJob(job._id)}
+                                            className="p-2 bg-slate-100 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                            title="Delete Drive"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="space-y-3 text-sm text-slate-600 mb-4">

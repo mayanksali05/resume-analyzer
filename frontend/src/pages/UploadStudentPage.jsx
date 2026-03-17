@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StudentUpload from '../components/StudentUpload';
 import { studentService } from '../services/api';
-import { User, Mail, GraduationCap, Award } from 'lucide-react';
+import { User, Mail, GraduationCap, Award, Trash2 } from 'lucide-react';
 
 const UploadStudentPage = () => {
     const [students, setStudents] = useState([]);
@@ -15,6 +15,18 @@ const UploadStudentPage = () => {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeleteStudent = async (id) => {
+        if (!window.confirm("Are you sure you want to remove this student?")) return;
+        
+        try {
+            await studentService.deleteStudent(id);
+            fetchStudents();
+        } catch (err) {
+            console.error(err);
+            alert("Error removing student");
         }
     };
 
@@ -45,7 +57,16 @@ const UploadStudentPage = () => {
                                             <User size={16} className="text-blue-500" />
                                             {student.name}
                                         </h4>
-                                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">{student.branch}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">{student.branch}</span>
+                                            <button 
+                                                onClick={() => handleDeleteStudent(student._id)}
+                                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                                title="Remove Student"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2 text-sm text-slate-500">
                                         <div className="flex items-center gap-2"><Mail size={14} /> {student.email}</div>

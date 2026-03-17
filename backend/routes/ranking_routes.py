@@ -26,25 +26,34 @@ def rank_students():
     for student in students:
         eligible = is_eligible(student, job)
         
+        ranking_item = {
+            "job_id": job_id,
+            "student_id": str(student['_id']),
+            "student_name": student['name'],
+            "branch": student['branch'],
+            "cgpa": student['cgpa'],
+            "email": student.get('email', 'N/A')
+        }
+
         if eligible:
             result = rank_candidate(student, job)
-            ranking_item = {
-                "job_id": job_id,
-                "student_id": str(student['_id']),
-                "student_name": student['name'],
-                "branch": student['branch'],
-                "cgpa": student['cgpa'],
+            ranking_item.update({
                 "score": result['score'],
                 "matched_skills": result['matched_skills'],
                 "eligibility_status": "eligible"
-            }
-            final_rankings.append(ranking_item)
+            })
         else:
-            # We still might want to show non-eligible students in some views, but as per requirements, only eligible proceed to ranking scoring
-            pass
+            ranking_item.update({
+                "score": 0,
+                "matched_skills": [],
+                "eligibility_status": "rejected",
+                "rejection_reason": "Criteria Not Met (CGPA/Branch)"
+            })
+            
+        final_rankings.append(ranking_item)
 
-    # Sort by score descending
-    final_rankings.sort(key=lambda x: x['score'], reverse=True)
+    # Sort: Eligible first, then by score descending
+    final_rankings.sort(key=lambda x: (x['eligibility_status'] == 'rejected', -x['score']))
     
     if final_rankings:
         rankings_collection.insert_many(final_rankings)

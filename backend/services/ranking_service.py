@@ -23,8 +23,20 @@ def rank_candidate(student, job):
     skill_score = calculate_skill_score(student.get('skills', []), job.get('required_skills', []))
     tfidf_score = calculate_tfidf_similarity(student.get('resume_text', ''), job.get('job_description', ''))
     
-    # Final Score = 0.7 * skill_match + 0.3 * TF-IDF similarity
-    final_score = (0.7 * skill_score) + (0.3 * tfidf_score)
+    # Normalize factors (capped at 1.0)
+    # CGPA normalized against 10 (reasonable max)
+    cgpa_factor = min(student.get('cgpa', 0) / 10, 1.0)
+    # 4 keywords = full score in exp/projects
+    exp_factor = min(student.get('experience_score', 0) / 4, 1.0) 
+    proj_factor = min(student.get('projects_score', 0) / 4, 1.0)   
+
+    # Holistic Weighted Score: 
+    # 40% Skills + 20% CGPA + 15% Experience + 15% Projects + 10% TF-IDF
+    final_score = (0.40 * skill_score) + \
+                  (0.20 * cgpa_factor) + \
+                  (0.15 * exp_factor) + \
+                  (0.15 * proj_factor) + \
+                  (0.10 * tfidf_score)
     
     return {
         "score": round(final_score, 4),

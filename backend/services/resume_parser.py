@@ -36,14 +36,22 @@ def parse_resume(text):
             break
 
     skills = extract_skills(text)
-    
-    # Simple education extraction
+
+    # Education extraction
     education = []
     edu_keywords = ["B.Tech", "M.Tech", "B.E", "Bachelor", "Degree", "University", "College", "School"]
     for keyword in edu_keywords:
         if keyword.lower() in text.lower():
             education.append(keyword)
-            
+
+    # Work Experience Detection
+    experience_keywords = ["experience", "internship", "worked at", "role", "responsibilities", "professional summary", "employment"]
+    exp_count = sum(1 for keyword in experience_keywords if keyword in text.lower())
+    
+    # Projects Detection
+    project_keywords = ["projects", "personal projects", "developed", "github", "deployed", "implemented", "academic project"]
+    proj_count = sum(1 for keyword in project_keywords if keyword in text.lower())
+
     return {
         "name": name,
         "email": email,
@@ -51,5 +59,8 @@ def parse_resume(text):
         "branch": detected_branch,
         "cgpa": cgpa,
         "skills": skills,
-        "education": ", ".join(list(set(education)))
+        "education": ", ".join(list(set(education))),
+        "experience_score": exp_count,
+        "projects_score": proj_count,
+        "resume_text": text
     }
