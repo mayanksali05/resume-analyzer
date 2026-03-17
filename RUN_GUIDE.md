@@ -1,10 +1,10 @@
-# 🛠️ Complete Setup & Execution Guide
+# Complete Setup & Execution Guide
 
 This document provides a step-by-step walkthrough to get your **Campus Placement Resume Analyzer** running locally and deployed to the cloud.
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 -   **Python 3.10+**
@@ -14,7 +14,7 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## 📂 Phase 1: Local Development Setup
+## Phase 1: Local Development Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -55,7 +55,7 @@ MAIL_DEFAULT_SENDER=your_gmail@gmail.com
 
 ---
 
-## 💾 Phase 2: Database Setup (MongoDB Atlas)
+## Phase 2: Database Setup (MongoDB Atlas)
 
 1.  Log in to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 2.  Create a new Cluster (Shared/Free).
@@ -65,7 +65,7 @@ MAIL_DEFAULT_SENDER=your_gmail@gmail.com
 
 ---
 
-## 💻 Phase 3: Frontend Setup (React/Vite)
+## Phase 3: Frontend Setup (React/Vite)
 
 Open a new terminal window in the root directory:
 ```bash
@@ -75,7 +75,7 @@ npm install
 
 ---
 
-## 🚀 Phase 4: Running the App Locally
+## Phase 4: Running the App Locally
 
 You need **two** terminals running simultaneously:
 
@@ -96,7 +96,7 @@ Visit `http://localhost:5173` to view the application!
 
 ---
 
-## ☁️ Phase 5: Cloud Deployment (Vercel)
+## Phase 5: Cloud Deployment (Vercel)
 
 ### 1. GitHub Push
 Ensure all your changes are pushed to GitHub:
@@ -123,7 +123,7 @@ git push origin main
 
 ---
 
-## 🧪 Verification Steps
+## Verification Steps
 1.  **Register**: Create a new account and verify via the OTP sent to your email.
 2.  **Job Drive**: Create a new drive (e.g., Google SDE).
 3.  **Upload**: Bulk upload 5-10 resumes in the **Student Management** section.

@@ -1,8 +1,8 @@
-# 🎓 Campus Placement Resume Analyzer & Ranker
+# Campus Placement Resume Analyzer & Ranker
 
 A state-of-the-art recruitment automation system designed for college placement cells. This platform uses AI to parse resumes, verify eligibility, and rank candidates based on a holistic score composition of skills, experience, projects, and academics.
 
-## 🚀 Key Features
+## Key Features
 
 -   **Holistic AI Ranking**: Moves beyond keyword matching to evaluate candidates based on:
     -   **40% Skills match** (NLP keyword extraction)
@@ -19,7 +19,7 @@ A state-of-the-art recruitment automation system designed for college placement 
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 -   **Frontend**: React.js, Vite, TailwindCSS, Lucide Icons.
 -   **Backend**: Flask (Python), Flask-Mail (OTP verification).
@@ -28,7 +28,7 @@ A state-of-the-art recruitment automation system designed for college placement 
 
 ---
 
-## 🏃 Getting Started
+## Getting Started
 
 ### Prerequisites
 -   Python 3.8+
