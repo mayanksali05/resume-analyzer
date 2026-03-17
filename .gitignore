@@ -1,0 +1,21 @@
+# Node.js
+frontend/node_modules/
+frontend/dist/
+frontend/package-lock.json
+.eslintcache
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.env
+
+# Uploads and Database
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
+*.log
