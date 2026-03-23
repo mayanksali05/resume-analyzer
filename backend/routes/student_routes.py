@@ -34,7 +34,9 @@ def upload_student():
         cleaned_text = clean_text(raw_text)
         parsed_data = parse_resume(raw_text)
         
+        admin_email = request.headers.get('X-User-Email')
         student_data = {
+            "admin_email": admin_email,
             "name": name or parsed_data['name'],
             "email": email,
             "phone": phone,
@@ -53,7 +55,8 @@ def upload_student():
 
 @student_bp.route('/students', methods=['GET'])
 def get_students():
-    students = list(students_collection.find({}, {"resume_text": 0}))
+    admin_email = request.headers.get('X-User-Email')
+    students = list(students_collection.find({"admin_email": admin_email}, {"resume_text": 0}))
     for s in students:
         s['_id'] = str(s['_id'])
     return jsonify(students), 200
@@ -79,7 +82,9 @@ def bulk_upload():
         cleaned_text = clean_text(raw_text)
         parsed_data = parse_resume(raw_text)
         
+        admin_email = request.headers.get('X-User-Email')
         student_data = {
+            "admin_email": admin_email,
             "name": parsed_data['name'],
             "email": parsed_data['email'],
             "phone": parsed_data['phone'],
@@ -102,15 +107,19 @@ def bulk_upload():
 def delete_student(student_id):
     from bson import ObjectId
     try:
-        # Delete student
-        result = students_collection.delete_one({"_id": ObjectId(student_id)})
+        admin_email = request.headers.get('X-User-Email')
+        # Delete student (ensure they belong to this admin)
+        result = students_collection.delete_one({
+            "_id": ObjectId(student_id),
+            "admin_email": admin_email
+        })
         
         if result.deleted_count > 0:
             # Also cleanup rankings for this student
             from models.database import rankings_collection
-            rankings_collection.delete_many({"student_id": student_id})
+            rankings_collection.delete_many({"student_id": student_id, "admin_email": admin_email})
             return jsonify({"message": "Student removed successfully"}), 200
         else:
-            return jsonify({"message": "Student not found"}), 404
+            return jsonify({"message": "Student not found or unauthorized"}), 404
     except Exception as e:
         return jsonify({"message": f"Error deleting student: {str(e)}"}), 500

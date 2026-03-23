@@ -7,7 +7,9 @@ job_bp = Blueprint('job', __name__)
 @job_bp.route('/create_job', methods=['POST'])
 def create_job():
     data = request.json
+    admin_email = request.headers.get('X-User-Email')
     job_data = {
+        "admin_email": admin_email,
         "company_name": data.get('company_name'),
         "job_role": data.get('job_role'),
         "job_description": data.get('job_description'),
@@ -21,7 +23,8 @@ def create_job():
 
 @job_bp.route('/jobs', methods=['GET'])
 def get_jobs():
-    jobs = list(jobs_collection.find())
+    admin_email = request.headers.get('X-User-Email')
+    jobs = list(jobs_collection.find({"admin_email": admin_email}))
     for j in jobs:
         j['_id'] = str(j['_id'])
     return jsonify(jobs), 200
@@ -30,6 +33,7 @@ def get_jobs():
 def update_job(job_id):
     from bson import ObjectId
     data = request.json
+    admin_email = request.headers.get('X-User-Email')
     update_data = {
         "company_name": data.get('company_name'),
         "job_role": data.get('job_role'),
@@ -39,11 +43,26 @@ def update_job(job_id):
         "allowed_branches": data.get('allowed_branches', []),
         "updated_at": datetime.utcnow()
     }
-    jobs_collection.update_one({"_id": ObjectId(job_id)}, {"$set": update_data})
+    result = jobs_collection.update_one({
+        "_id": ObjectId(job_id),
+        "admin_email": admin_email
+    }, {"$set": update_data})
+    
+    if result.matched_count == 0:
+        return jsonify({"message": "Job drive not found or unauthorized"}), 404
+        
     return jsonify({"message": "Job drive updated successfully"}), 200
 
 @job_bp.route('/jobs/<job_id>', methods=['DELETE'])
 def delete_job(job_id):
     from bson import ObjectId
-    jobs_collection.delete_one({"_id": ObjectId(job_id)})
+    admin_email = request.headers.get('X-User-Email')
+    result = jobs_collection.delete_one({
+        "_id": ObjectId(job_id),
+        "admin_email": admin_email
+    })
+    
+    if result.deleted_count == 0:
+        return jsonify({"message": "Job drive not found or unauthorized"}), 404
+        
     return jsonify({"message": "Job drive deleted successfully"}), 200

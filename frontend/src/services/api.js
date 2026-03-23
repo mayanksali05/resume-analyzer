@@ -11,6 +11,20 @@ const api = axios.create({
     baseURL: API_BASE_URL,
 });
 
+// Add a request interceptor to include the user's email in headers
+api.interceptors.request.use(
+    (config) => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.email) {
+            config.headers['X-User-Email'] = user.email;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export const authService = {
     login: (credentials) => api.post('/auth/login', credentials),
     register: (details) => api.post('/auth/register', details),

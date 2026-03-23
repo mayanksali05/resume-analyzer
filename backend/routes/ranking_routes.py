@@ -12,21 +12,24 @@ ranking_bp = Blueprint('ranking', __name__)
 def rank_students():
     data = request.json
     job_id = data.get('job_id')
+    admin_email = request.headers.get('X-User-Email')
     
-    job = jobs_collection.find_one({"_id": ObjectId(job_id)})
+    # Ensure job belongs to this admin
+    job = jobs_collection.find_one({"_id": ObjectId(job_id), "admin_email": admin_email})
     if not job:
-        return jsonify({"message": "Job not found"}), 404
+        return jsonify({"message": "Job not found or unauthorized"}), 404
         
-    students = list(students_collection.find())
+    students = list(students_collection.find({"admin_email": admin_email}))
     
     # Clear previous rankings for this job
-    rankings_collection.delete_many({"job_id": job_id})
+    rankings_collection.delete_many({"job_id": job_id, "admin_email": admin_email})
     
     final_rankings = []
     for student in students:
         eligible = is_eligible(student, job)
         
         ranking_item = {
+            "admin_email": admin_email,
             "job_id": job_id,
             "student_id": str(student['_id']),
             "student_name": student['name'],
@@ -64,13 +67,21 @@ def rank_students():
 
 @ranking_bp.route('/rankings/<job_id>', methods=['GET'])
 def get_rankings(job_id):
-    rankings = list(rankings_collection.find({"job_id": job_id}).sort("score", -1))
+    admin_email = request.headers.get('X-User-Email')
+    rankings = list(rankings_collection.find({
+        "job_id": job_id,
+        "admin_email": admin_email
+    }).sort("score", -1))
     for r in rankings:
         r['_id'] = str(r['_id'])
     return jsonify(rankings), 200
 @ranking_bp.route('/rankings/<job_id>/download', methods=['GET'])
 def download_rankings_csv(job_id):
-    rankings = list(rankings_collection.find({"job_id": job_id}).sort("score", -1))
+    admin_email = request.headers.get('X-User-Email')
+    rankings = list(rankings_collection.find({
+        "job_id": job_id,
+        "admin_email": admin_email
+    }).sort("score", -1))
     
     if not rankings:
         return jsonify({"message": "No rankings found for this job"}), 404
